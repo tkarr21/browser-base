@@ -17,6 +17,7 @@ import { showExtensionDialog } from '../dialogs/extension-popup';
 import { showDownloadsDialog } from '../dialogs/downloads';
 import { showZoomDialog } from '../dialogs/zoom';
 import { showTabGroupDialog } from '../dialogs/tabgroup';
+import { showDnssecDialog } from '../dialogs/dnssec';
 
 export const runMessagingService = (appWindow: AppWindow) => {
   const { id } = appWindow;
@@ -101,6 +102,11 @@ export const runMessagingService = (appWindow: AppWindow) => {
 
   ipcMain.on(`show-zoom-dialog-${id}`, (e, left, top) => {
     showZoomDialog(appWindow.win, left, top);
+  });
+
+  ipcMain.on(`show-dnssec-dialog-${id}`, (e, left, top) => {
+    const view = appWindow.viewManager.selected;
+    showDnssecDialog(appWindow.win, left, top, view.dnssecStatusInfo);
   });
 
   ipcMain.on(`show-tabgroup-dialog-${id}`, (e, tabGroup) => {

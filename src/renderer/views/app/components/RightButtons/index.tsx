@@ -18,9 +18,13 @@ let menuRef: HTMLDivElement = null;
 let downloadDialogRef: HTMLDivElement = null;
 
 const showDownloadDialog = async () => {
-  const { right, bottom } = downloadDialogRef.getBoundingClientRect();
-  store.downloadNotification = false;
-  ipcRenderer.send(`show-downloads-dialog-${store.windowId}`, right, bottom);
+  try {
+    const { right, bottom } = downloadDialogRef.getBoundingClientRect();
+    store.downloadNotification = false;
+    ipcRenderer.send(`show-downloads-dialog-${store.windowId}`, right, bottom);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 ipcRenderer.on('show-download-dialog', () => {

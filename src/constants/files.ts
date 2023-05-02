@@ -8,6 +8,8 @@ export const ERROR_PROTOCOL = 'wexond-error';
 
 export const NETWORK_ERROR_HOST = 'network-error';
 
+export const DNSSEC_BOGUS_HOST = 'dnssec-bogus';
+
 export const WEBUI_BASE_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:4444/'

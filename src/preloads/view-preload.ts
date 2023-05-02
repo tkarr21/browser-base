@@ -134,9 +134,13 @@ if (
       return undefined;
     };
 
-    if (window.location.pathname.startsWith('//network-error')) {
+    if (
+      window.location.pathname.startsWith('//network-error') ||
+      window.location.pathname.startsWith('//dnssec-bogus')
+    ) {
       w.theme = getTheme(w.settings.theme);
       w.errorURL = await ipcRenderer.invoke(`get-error-url-${tabId}`);
+      w.errorHost = await ipcRenderer.invoke(`get-error-host-${tabId}`);
     } else if (hostname.startsWith('history')) {
       w.getHistory = async () => {
         return await ipcRenderer.invoke(`history-get`);
@@ -224,5 +228,25 @@ if (window.location.href.startsWith(WEBUI_BASE_URL)) {
       },
       '*',
     );
+  });
+}
+
+// add click listener to bogus page buttons
+if (window.location.pathname.startsWith('//dnssec-bogus')) {
+  window.addEventListener('DOMContentLoaded', () => {
+    document
+      .getElementById('primary-button')
+      ?.addEventListener('click', async () => {
+        goBack();
+        goBack();
+      });
+
+    document
+      .getElementById('continue-link')
+      ?.addEventListener('click', async () => {
+        // add the host to the list of allowed hosts
+        const w = await webFrame.executeJavaScript('window');
+        ipcRenderer.send('dnssec-ignored-host', w.errorHost);
+      });
   });
 }

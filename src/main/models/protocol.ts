@@ -28,6 +28,11 @@ export const registerProtocol = (session: Electron.Session) => {
           path: join(__dirname, '../static/pages/', `network-error.html`),
         });
       }
+      if (parsed.hostname === 'dnssec-bogus') {
+        return callback({
+          path: join(__dirname, '../static/pages', `dnssec-bogus.html`),
+        });
+      }
     },
   );
 

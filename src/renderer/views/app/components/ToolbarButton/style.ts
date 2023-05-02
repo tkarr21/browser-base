@@ -21,6 +21,7 @@ export const Icon = styled.div`
     autoInvert,
     theme,
     dense,
+    animate,
   }: {
     size: number;
     disabled: boolean;
@@ -28,12 +29,14 @@ export const Icon = styled.div`
     autoInvert?: boolean;
     dense?: boolean;
     theme?: ITheme;
+    animate?: boolean;
   }) => css`
     ${centerIcon(size)};
     opacity: ${disabled ? 0.25 : opacity};
     filter: ${autoInvert && theme['toolbar.lightForeground']
       ? 'invert(100%)'
       : 'none'};
+    transition: ${animate ? 'background-image 0.5s ease-in-out' : ''};
   `};
 `;
 

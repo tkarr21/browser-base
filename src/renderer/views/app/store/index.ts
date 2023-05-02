@@ -15,6 +15,8 @@ import { IBrowserAction } from '../models';
 import { NEWTAB_URL } from '~/constants/tabs';
 import { IURLSegment } from '~/interfaces/urls';
 import { BookmarkBarStore } from './bookmark-bar';
+import { IDnssecStatus } from '~/interfaces/dnssec-status';
+import { callViewMethod } from '~/utils/view';
 
 export class Store {
   public settings = new SettingsStore(this);
@@ -72,6 +74,8 @@ export class Store {
   public isBookmarked = false;
 
   public zoomFactor = 1;
+
+  public dnssecStatus = 'insecure';
 
   public dialogsVisibility: { [key: string]: boolean } = {
     menu: false,
@@ -232,6 +236,21 @@ export class Store {
 
     ipcRenderer.on('is-bookmarked', (e, flag) => {
       this.isBookmarked = flag;
+    });
+
+    ipcRenderer.on('dnssec-updated', (e, dnssecStatusInfo: IDnssecStatus) => {
+      this.dnssecStatus = dnssecStatusInfo.status;
+    });
+
+    ipcRenderer.on('skip-bogus-page', () => {
+      const tab = this.tabs.selectedTab;
+
+      if (tab.navigateDirection === 'back') {
+        callViewMethod(tab.id, 'goBack');
+        callViewMethod(tab.id, 'goBack');
+      } else {
+        callViewMethod(tab.id, 'goForward');
+      }
     });
 
     ipcRenderer.on(

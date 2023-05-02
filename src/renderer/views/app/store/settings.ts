@@ -29,6 +29,7 @@ export class SettingsStore {
       selectedSection: observable,
       object: observable,
       searchEngine: computed,
+      dohServer: computed,
       updateSettings: action,
     });
 
@@ -50,6 +51,10 @@ export class SettingsStore {
 
   public get searchEngine() {
     return this.object.searchEngines[this.object.searchEngine];
+  }
+
+  public get dohServer() {
+    return this.object.dohServers[this.object.dohServer];
   }
 
   public updateSettings(newSettings: ISettings) {

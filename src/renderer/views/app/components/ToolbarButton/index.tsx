@@ -32,6 +32,7 @@ interface Props {
   dense?: boolean;
   iconStyle?: any;
   id?: string;
+  animate?: boolean;
 }
 
 export const ToolbarButton = observer(
@@ -61,6 +62,7 @@ export const ToolbarButton = observer(
     dense,
     iconStyle,
     id,
+    animate,
   }: Props) => {
     style = { ...style };
 
@@ -85,6 +87,7 @@ export const ToolbarButton = observer(
           disabled={disabled}
           opacity={opacity}
           autoInvert={autoInvert}
+          animate={animate}
         />
         {badge && (
           <Badge

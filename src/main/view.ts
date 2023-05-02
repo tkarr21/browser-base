@@ -7,6 +7,7 @@ import {
   ERROR_PROTOCOL,
   NETWORK_ERROR_HOST,
   WEBUI_BASE_URL,
+  DNSSEC_BOGUS_HOST,
 } from '~/constants/files';
 import { NEWTAB_URL } from '~/constants/tabs';
 import {
@@ -18,6 +19,7 @@ import { TabEvent } from '~/interfaces/tabs';
 import { Queue } from '~/utils/queue';
 import { Application } from './application';
 import { getUserAgentForURL } from './user-agent';
+import { getDnssecStatus } from '../renderer/views/dnssec/utils/status';
 
 interface IAuthInfo {
   url: string;
@@ -47,6 +49,16 @@ export class View {
     occurrences: '0/0',
     text: '',
   };
+
+  public dnssecStatusInfo = {
+    status: 'insecure',
+    ignored: false,
+    host: '',
+    url: '',
+    edns_error: 0,
+  };
+
+  public ignoredHosts: string[] = [];
 
   public requestedAuth: IAuthInfo;
   public requestedPermission: any;
@@ -96,6 +108,14 @@ export class View {
       return this.errorURL;
     });
 
+    ipcMain.handle(`get-error-host-${this.id}`, async (e) => {
+      return this.dnssecStatusInfo.host;
+    });
+
+    ipcMain.on('dnssec-ignored-host', (e, host) => {
+      this.ignoredHosts.push(host);
+    });
+
     this.webContents.on('context-menu', (e, params) => {
       const menu = getViewMenu(this.window, params, this.webContents);
       menu.popup();
@@ -116,6 +136,14 @@ export class View {
     });
 
     this.webContents.addListener('did-navigate', async (e, url) => {
+      if (
+        url.includes(DNSSEC_BOGUS_HOST) &&
+        this.ignoredHosts.includes(this.dnssecStatusInfo.host)
+      ) {
+        // request navigation direction
+        this.window.send('skip-bogus-page');
+      }
+
       this.emitEvent('did-navigate', url);
 
       await this.addHistoryItem(url);
@@ -376,6 +404,8 @@ export class View {
   public updateURL = (url: string) => {
     if (this.lastUrl === url) return;
 
+    // here is where we will switch out task site url for staged site domains
+
     this.emitEvent('url-updated', this.hasError ? this.errorURL : url);
 
     this.lastUrl = url;
@@ -387,7 +417,35 @@ export class View {
     if (process.env.ENABLE_AUTOFILL) this.updateCredentials();
 
     this.updateBookmark();
+
+    this.updateDnssecStatusInfo(url);
   };
+
+  public updateDnssecStatusInfo(url: string) {
+    // the call that gets the dnssec status,statuses
+    // are hard coded currently for our purposes
+
+    // check for error protocol
+    if (url.startsWith(`${ERROR_PROTOCOL}://`)) {
+      return;
+    }
+    this.dnssecStatusInfo = getDnssecStatus(url);
+    this.window.send('dnssec-updated', this.dnssecStatusInfo);
+    this.emitEvent('dnssec-updated', this.dnssecStatusInfo.status);
+
+    if (this.dnssecStatusInfo.status == 'bogus') {
+      this.errorURL = this.dnssecStatusInfo.url;
+
+      // check if the host is in the ignored list
+      if (!this.ignoredHosts.includes(this.dnssecStatusInfo.host)) {
+        this.hasError = true;
+        // show bogus error message on screen
+        this.webContents.loadURL(
+          `${ERROR_PROTOCOL}://${DNSSEC_BOGUS_HOST}/${this.dnssecStatusInfo.edns_error}`,
+        );
+      }
+    }
+  }
 
   public updateBookmark() {
     this.bookmark = Application.instance.storage.bookmarks.find(

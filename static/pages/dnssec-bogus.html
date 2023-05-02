@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark light" />
+
+    <style>
+      :root {
+        --button-color: #007bff;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: rgba(0, 0, 0, 0.54);
+      }
+
+      .main {
+        margin: 0 auto;
+        width: calc(100% - 32px);
+        max-width: 600px;
+        margin: 14vh auto 0;
+      }
+
+      #main-title {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+
+      #main-error-code {
+        font-size: 12px;
+      }
+
+      #main-description {
+        margin-bottom: 16px;
+        line-height: 1.5rem;
+      }
+
+      ul {
+        margin-top: 0;
+      }
+
+      #main-icon {
+        background-repeat: no-repeat;
+        width: 72px;
+        height: 100px;
+        margin-bottom: 20px;
+      }
+
+      #navigation-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-bottom: 16px;
+      }
+
+      #primary-button {
+        background-color: var(--button-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      #secondary-button {
+        color: var(--button-color);
+        background-color: transparent;
+        border: 1px solid var(--button-color);
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      #secondary-button:hover {
+        background-color: #e8e8e8;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      #continue-text {
+        margin-top: 16px;
+      }
+
+      #continue-link {
+        color: var(--button-color);
+        cursor: pointer;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="main">
+      <div id="main-icon"></div>
+      <div id="main-title"></div>
+      <div id="main-description"></div>
+      <div id="main-error-code"></div>
+      <div id="navigation-wrapper">
+        <button id="secondary-button">Advanced</button>
+        <button id="primary-button">Back to Safety</button>
+
+      </div>
+      <div id="details" class="hidden">
+        <p id="advanced-description"></p>
+        <p id="continue-text">
+          <a id="continue-link"></a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      
+      
+      document.body.style.backgroundColor =
+        window.theme['pages.backgroundColor'];
+
+      const url = window.errorURL;
+      const host = window.errorHost;
+
+      document.title = 'Insecure Address';
+
+      const errorCodeEl = document.getElementById('main-error-code');
+      const titleEl = document.getElementById('main-title');
+      const descriptionEl = document.getElementById('main-description');
+      const iconEl = document.getElementById('main-icon');
+      const details = document.getElementById('details');
+      const advancedDescriptionEl = document.getElementById(
+        'advanced-description'
+      );
+      const continue_linkEl = document.getElementById('continue-link');
+
+      if (window.theme['pages.lightForeground']) {
+        document.body.style.color = 'rgba(255, 255, 255, 0.54)';
+        iconEl.style.filter = 'invert(1)';
+      }
+
+      if (window.location.href.split('/').length === 4) {
+        errorCode = window.location.href.split('/')[3];
+      }
+
+      // change secondary button text on click and show details
+      const secondaryButton = document.getElementById('secondary-button');
+      secondaryButton.addEventListener('click', () => {
+        if (secondaryButton.innerText === 'Advanced') {
+          secondaryButton.innerText = 'Hide Advanced';
+          details.classList.remove('hidden');
+        } else {
+          secondaryButton.innerText = 'Advanced';
+          details.classList.add('hidden');
+        }
+      });
+
+      const bogusIcon = 'data:image/png;base64,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';
+
+      const info = {
+        '1': {
+          title: 'Insecure Address',
+          description: `Attackers might be pretending to be <strong>${host}</strong> in order to trick you into doing something dangerous such as installing software or revealing your personal information (passwords, phone numbers, or credit cards). This is a problem with the host, not with your network.`,
+          advanced_description: `The host <strong>${host}</strong> is using a weak algorithm for DNSSEC. This means that the host's IP address is susceptible to tampering.`,
+          code: `UNSUPPORTED_DNSKEY_ALGORITHM`,
+        },
+        '2': {
+          title: 'Insecure Address',
+          description: `Attackers might be pretending to be <strong>${host}</strong> in order to trick you into doing something dangerous such as installing software or revealing your personal information (passwords, phone numbers, or credit cards). This is a problem with the host, not with your network.`,
+          advanced_description: `The host <strong>${host}</strong> is using only unsupported Digest Types for DNSSEC. This means that the IP address is susceptible to tampering.`,
+          code: 'UNSUPPORTED_DS_DIGEST_TYPE',
+        },
+        '3': {
+          title: 'Insecure Address',
+          description: `Attackers might be pretending to be <strong>${host}</strong> in order to trick you into doing something dangerous such as installing software or revealing your personal information (passwords, phone numbers, or credit cards). This is a problem with the host, not with your network.`,
+          advanced_description: 'The DNS resolver was unable to resolve and validate the response within its time limits and decided to answer with previously cached data instead of answering with an error. This is typically caused by problems communicating with an authoritative server, possibly as result of a denial of service (DoS) attack against another network.',
+          code: 'STALE_ANSWER',
+        },
+        '5': {
+          title: 'Can`t validate Address',
+          description: `Attackers might be pretending to be <strong>${host}</strong> in order to trick you into doing something dangerous such as installing software or revealing your personal information (passwords, phone numbers, or credit cards). This is a problem with the host, not with your network.`,
+          advanced_description: `The resolver attempted to perform DNSSEC validation for <strong>${host}</strong>, but was unable to contact security-aware name servers for the relevant zones`,
+          code: 'DNSSEC_INDETERMINATE'
+        },
+        '6': {
+          title: 'Unsafe Address',
+          description: `The Address received for this host did not validate as one of ${host}'s published addresses. The recieved IP address and the content it serves should be treated with caution. This is a problem with the host, not with your network.`,
+          advanced_description: `The DNS resolver attempted to perform DNSSEC validation for <strong>${host}</strong>, but validation ended in the Bogus state. This may be due to a misconfiguration, however it is also what would result in the case of an active attack.`,
+          code: 'DNSSEC_BOGUS',
+        },
+        '7': {
+          title: 'Can`t validate Address',
+          description: `Attackers might be pretending to be <strong>${host}</strong> in order to trick you into doing something dangerous such as installing software or revealing your personal information (passwords, phone numbers, or credit cards). This is a problem with the host, not with your network.`,
+          advanced_description: 'The DNS resolver attempted to perform DNSSEC validation, but no signatures are presently valid and some (or all) are expired.',
+          code: 'SIGNATURE_EXPIRED'
+        },
+        //TODO: add description and edit advanced description
+        '8': {
+          title: 'Can`t validate Address',
+          description: '',
+          advanced_description: 'The resolver attempted to perform DNSSEC validation, but no signatures are presently valid and at least some are not yet valid.',
+          code: 'SIGNATURE_NOT_YET_VALID'
+        },
+        '9': {
+          title: 'Can`t validate Address',
+          description: '',
+          advanced_description: 'A DS record existed at a parent, but no supported matching DNSKEY record could be found for the child.',
+          code: 'DNSSKEY_MISSING'
+        },
+        '10': {
+          title: 'Can`t validate Address',
+          description: '',
+          advanced_description: 'The resolver attempted to perform DNSSEC validation, but no RRSIGs could be found for at least one RRset where RRSIGs were expected.',
+          code: 'RRSIGS_MISSING'
+        },
+        '11': {
+          title: 'Can`t validate Address',
+          description: '',
+          advanced_description: 'The resolver attempted to perform DNSSEC validation, but no Zone Key Bit was set in a DNSKEY.',
+          code: 'NO_ZONE_KEY_BIT_SET'
+        },
+        '12': {
+          title: 'Can`t validate Address',
+          description: '',
+          advanced_description: 'The resolver attempted to perform DNSSEC validation, but the requested data was missing and a covering NSEC or NSEC3 was not provided.',
+          code: 'NSEC_MISSING'
+        },
+      };
+
+      const { title, description, code, icon, advanced_description } = info[errorCode];
+      titleEl.textContent = title;
+      descriptionEl.innerHTML = description;
+      errorCodeEl.textContent = code;
+      iconEl.style.backgroundImage = `url(${bogusIcon})`;
+      advancedDescriptionEl.innerHTML = advanced_description;
+      continue_linkEl.href = url;
+      continue_linkEl.textContent = `Proceed to ${host} (unsafe)`;
+
+    </script>
+  </body>
+
+</html>

@@ -20,6 +20,8 @@ import { ipcRenderer } from 'electron';
 import { defaultTabOptions } from '~/constants/tabs';
 import { TOOLBAR_HEIGHT } from '~/constants/design';
 import { TabEvent } from '~/interfaces/tabs';
+import { domains } from '~/constants/domains';
+import { parse } from 'url';
 
 export class TabsStore {
   public isDragging = false;
@@ -139,6 +141,7 @@ export class TabsStore {
         if (event === 'title-updated') tab.title = args[0];
         if (event === 'favicon-updated') tab.favicon = args[0];
         if (event === 'did-navigate') tab.favicon = '';
+        if (event === 'dnssec-updated') tab.dnssecStatus = args[0];
         if (event === 'media-playing') tab.isPlaying = true;
         if (event === 'media-paused') tab.isPlaying = false;
         if (event === 'loading') tab.loading = args[0];
@@ -151,6 +154,32 @@ export class TabsStore {
 
           if (tab.id === this.selectedTabId && !store.addressbarFocused) {
             this.selectedTab.addressbarValue = null;
+          }
+
+          let { protocol, hostname, path } = parse(tab.url);
+
+          if (hostname.includes('localhost')) {
+            if (tab.url.includes('bank')) {
+              hostname = domains.bank.domain;
+            } else if (tab.url.includes('downloading')) {
+              hostname = domains.downloading.domain;
+            } else if (tab.url.includes('email')) {
+              hostname = domains.email.domain;
+            } else if (tab.url.includes('online-shop')) {
+              hostname = domains['online-shop'].domain;
+            } else if (tab.url.includes('pay-bill')) {
+              hostname = domains['pay-bill'].domain;
+            } else if (tab.url.includes('read-wiki')) {
+              hostname = domains['read-wiki'].domain;
+            } else if (tab.url.includes('recipe')) {
+              hostname = domains.recipe.domain;
+            } else if (tab.url.includes('trading')) {
+              hostname = domains.trading.domain;
+            } else if (tab.url.includes('weather')) {
+              hostname = domains.weather.domain;
+            }
+            // make it appear as https
+            tab.addressbarValue = `https://${hostname}${path}`;
           }
         }
 
@@ -239,8 +268,12 @@ export class TabsStore {
     requestAnimationFrame(() => {
       this.updateTabsBounds(false);
       if (this.scrollable) {
-        this.containerRef.current.scrollLeft =
-          this.containerRef.current.scrollWidth;
+        try {
+          this.containerRef.current.scrollLeft =
+            this.containerRef.current.scrollWidth;
+        } catch (e) {
+          console.log(e);
+        }
       }
     });
 
@@ -248,25 +281,31 @@ export class TabsStore {
   }
 
   public scrollToEnd = (milliseconds: number) => {
-    if (!this.scrollable) return;
+    if (this.containerRef === null) return;
+    try {
+      if (!this.scrollable) return;
 
-    const frame = () => {
-      if (!this.scrollingToEnd) return;
-      this.containerRef.current.scrollLeft =
-        this.containerRef.current.scrollWidth;
-      requestAnimationFrame(frame);
-    };
+      const frame = () => {
+        if (!this.scrollingToEnd) return;
 
-    if (!this.scrollingToEnd) {
-      this.scrollingToEnd = true;
-      frame();
+        this.containerRef.current.scrollLeft =
+          this.containerRef.current.scrollWidth;
+        requestAnimationFrame(frame);
+      };
+
+      if (!this.scrollingToEnd) {
+        this.scrollingToEnd = true;
+        frame();
+      }
+
+      clearTimeout(this.scrollTimeout);
+
+      this.scrollTimeout = setTimeout(() => {
+        this.scrollingToEnd = false;
+      }, milliseconds);
+    } catch (e: any) {
+      console.log(e);
     }
-
-    clearTimeout(this.scrollTimeout);
-
-    this.scrollTimeout = setTimeout(() => {
-      this.scrollingToEnd = false;
-    }, milliseconds);
   };
 
   @action

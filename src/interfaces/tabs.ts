@@ -10,4 +10,5 @@ export type TabEvent =
   | 'blocked-ad'
   | 'zoom-updated'
   | 'media-playing'
-  | 'media-paused';
+  | 'media-paused'
+  | 'dnssec-updated';

@@ -58,6 +58,10 @@ export class ITab {
 
   public hasCredentials = false;
 
+  public dnssecStatus = '';
+
+  public navigateDirection = 'back';
+
   // Computed
   public get isSelected() {
     return store.tabs.selectedTabId === this.id;
@@ -92,6 +96,8 @@ export class ITab {
       title: observable,
       blockedAds: observable,
       hasCredentials: observable,
+      dnssecStatus: observable,
+      navigateDirection: observable,
       isSelected: computed,
       isHovered: computed,
       isExpanded: computed,

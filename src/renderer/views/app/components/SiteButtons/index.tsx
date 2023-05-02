@@ -8,6 +8,9 @@ import {
   ICON_MAGNIFY_PLUS,
   ICON_MAGNIFY_MINUS,
   ICON_SHIELD,
+  ICON_DNSSEC_INSECURE,
+  ICON_DNSSEC_SECURE,
+  ICON_DNSSEC_BOGUS,
 } from '~/renderer/constants/icons';
 import { ipcRenderer, remote } from 'electron';
 import { parse } from 'url';
@@ -28,12 +31,22 @@ const showZoomDialog = async () => {
   }
 };
 
+const showDnssecDialog = async () => {
+  const dnssecStatus = document.getElementById('dnssec-status');
+  const { right, bottom } = dnssecStatus.getBoundingClientRect();
+  ipcRenderer.send(`show-dnssec-dialog-${store.windowId}`, right, bottom);
+};
+
 const onStarClick = (e: React.MouseEvent<HTMLDivElement>) => {
   showAddBookmarkDialog();
 };
 
 const onZoomClick = (e: React.MouseEvent<HTMLDivElement>) => {
   showZoomDialog();
+};
+
+const onDnssecClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  showDnssecDialog();
 };
 
 const onKeyClick = () => {
@@ -54,6 +67,10 @@ ipcRenderer.on('show-add-bookmark-dialog', () => {
 
 ipcRenderer.on('show-zoom-dialog', () => {
   showZoomDialog();
+});
+
+ipcRenderer.on('show-dnssec-dialog', () => {
+  showDnssecDialog();
 });
 
 ipcRenderer.on('zoom-factor-updated', (e, zoomFactor, showDialog) => {
@@ -84,13 +101,28 @@ export const SiteButtons = observer(() => {
 
   let hasCredentials = false;
   let blockedAds = 0;
+  let dnssecStatus = '';
 
   if (selectedTab) {
     hasCredentials = selectedTab.hasCredentials;
     blockedAds = selectedTab.blockedAds;
+    dnssecStatus = selectedTab.dnssecStatus;
   }
 
   const dense = !store.isCompact;
+
+  const dnssecIcon = () => {
+    switch (dnssecStatus) {
+      case 'insecure':
+        return ICON_DNSSEC_INSECURE;
+      case 'secure':
+        return ICON_DNSSEC_SECURE;
+      case 'bogus':
+        return ICON_DNSSEC_BOGUS;
+      default:
+        return ICON_DNSSEC_INSECURE;
+    }
+  };
 
   return (
     <>
@@ -113,6 +145,14 @@ export const SiteButtons = observer(() => {
         />
       )}
       <ToolbarButton
+        id="dnssec-status"
+        icon={dnssecIcon()}
+        size={20}
+        onMouseDown={onDnssecClick}
+        iconStyle={{}}
+        animate={true}
+      />
+      <ToolbarButton
         id="star"
         toggled={store.dialogsVisibility['add-bookmark']}
         icon={store.isBookmarked ? ICON_STAR_FILLED : ICON_STAR}
@@ -120,14 +160,14 @@ export const SiteButtons = observer(() => {
         dense={dense}
         onMouseDown={onStarClick}
       />
-      <ToolbarButton
+      {/*<ToolbarButton
         size={16}
         badge={store.settings.object.shield && blockedAds > 0}
         badgeText={blockedAds.toString()}
         icon={ICON_SHIELD}
         opacity={store.settings.object.shield ? 0.87 : 0.54}
         onContextMenu={onShieldContextMenu}
-      ></ToolbarButton>
+      ></ToolbarButton>*/}
     </>
   );
 });

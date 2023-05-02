@@ -12,14 +12,20 @@ import {
 } from '~/renderer/constants/icons';
 
 const onBackClick = () => {
+  store.tabs.selectedTab.navigateDirection = 'back';
+  if (store.tabs.selectedTab.title.includes('Address')) {
+    store.tabs.selectedTab.callViewMethod('goBack');
+  }
   store.tabs.selectedTab.callViewMethod('goBack');
 };
 
 const onForwardClick = () => {
+  store.tabs.selectedTab.navigateDirection = 'forward';
   store.tabs.selectedTab.callViewMethod('goForward');
 };
 
 const onRefreshClick = () => {
+  return;
   if (store.tabs.selectedTab && store.tabs.selectedTab.loading) {
     store.tabs.selectedTab.callViewMethod('stop');
   } else {
