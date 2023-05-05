@@ -32,19 +32,19 @@ const content: IPopupContent[] = [
     label: 'secure',
     icon: ICON_DNSSEC_SECURE,
     description:
-      'The IP address received for this host successfully validated as one of the published IP addresses for this host.',
+      'The address received for this host successfully validated as one of the published addresses for this host.',
   },
   {
     label: 'insecure',
     icon: ICON_DNSSEC_INSECURE,
     description:
-      'We are unable to validate the IP address received for this host becuase the host does not have any IP addresses securely published with DNSSEC.',
+      'We are unable to validate the address received for this host becuase the host does not have any addresses securely published with DNSSEC.',
   },
   {
     label: 'bogus',
     icon: ICON_DNSSEC_BOGUS,
     description:
-      'The IP address received for this host did not validate as one of the published IP addresses for this host. We advise extreme caution while interacting with this site.',
+      'The address received for this host did not validate as one of the published addresses for this host. We advise extreme caution while interacting with this site.',
   },
 ];
 

@@ -25,7 +25,6 @@ const onForwardClick = () => {
 };
 
 const onRefreshClick = () => {
-  return;
   if (store.tabs.selectedTab && store.tabs.selectedTab.loading) {
     store.tabs.selectedTab.callViewMethod('stop');
   } else {
