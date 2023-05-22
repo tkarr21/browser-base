@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { reaction, observable, computed, makeObservable } from 'mobx';
+import { reaction, observable, makeObservable } from 'mobx';
 import { DialogStore } from '~/models/dialog-store';
 import { IDnssecStatus } from '~/interfaces/dnssec-status';
 
@@ -13,12 +13,8 @@ export class Store extends DialogStore {
     status: 'insecure',
     ignored: false,
     host: '',
+    edns_error: 0,
   } as IDnssecStatus;
-
-  @computed
-  public get dohServer() {
-    return this.settings.dohServers[this.settings.dohServer];
-  }
 
   public constructor() {
     super();

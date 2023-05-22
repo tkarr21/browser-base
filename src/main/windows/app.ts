@@ -151,15 +151,16 @@ export class AppWindow {
         Application.instance.sessions.unloadIncognitoExtensions();
       }
 
-      Application.instance.windows.list = Application.instance.windows.list.filter(
-        (x) => x.win.id !== this.win.id,
-      );
+      Application.instance.windows.list =
+        Application.instance.windows.list.filter(
+          (x) => x.win.id !== this.win.id,
+        );
     });
 
     // this.webContents.openDevTools({ mode: 'detach' });
 
     if (process.env.NODE_ENV === 'development') {
-      this.webContents.openDevTools({ mode: 'detach' });
+      //this.webContents.openDevTools({ mode: 'detach' });
       this.win.loadURL('http://localhost:4444/app.html');
     } else {
       this.win.loadURL(join('file://', app.getAppPath(), 'build/app.html'));

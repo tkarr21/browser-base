@@ -20,9 +20,9 @@ export const showDnssecDialog = (
     browserWindow,
     getBounds: () => {
       return {
-        width: 500,
-        height: 305,
-        x: x - 500 + DIALOG_MARGIN,
+        width: 900,
+        height: 760,
+        x: x - 900 + DIALOG_MARGIN,
         y: VIEW_Y_OFFSET,
       };
     },

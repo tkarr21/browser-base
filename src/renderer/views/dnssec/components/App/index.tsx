@@ -25,6 +25,7 @@ interface IPopupContent {
   label?: string;
   icon?: string;
   description?: string;
+  source?: string;
 }
 
 const content: IPopupContent[] = [
@@ -33,18 +34,24 @@ const content: IPopupContent[] = [
     icon: ICON_DNSSEC_SECURE,
     description:
       'The address received for this host successfully validated as one of the published addresses for this host.',
+    source:
+      'https://drive.google.com/uc?export=download&id=1ycU5W-vyixzcg22_3XNI1SIdqKjptioE', //https://drive.google.com/file/d/1ycU5W-vyixzcg22_3XNI1SIdqKjptioE/view?usp=sharing
   },
   {
     label: 'insecure',
     icon: ICON_DNSSEC_INSECURE,
     description:
-      'We are unable to validate the address received for this host becuase the host does not have any addresses securely published with DNSSEC.',
+      'We are unable to validate the address received for this host becuase the host does not offer address validation.',
+    source:
+      'https://drive.google.com/uc?export=download&id=1dU4mz3AouAwz2jKT1FTE2rlz8-fVeoGP', //https://drive.google.com/file/d/1dU4mz3AouAwz2jKT1FTE2rlz8-fVeoGP/view?usp=sharing
   },
   {
     label: 'bogus',
     icon: ICON_DNSSEC_BOGUS,
     description:
-      'The address received for this host did not validate as one of the published addresses for this host. We advise extreme caution while interacting with this site.',
+      'The address received for this host failed validation. We advise caution while interacting with this site.',
+    source:
+      'https://drive.google.com/uc?export=download&id=1OpqpDsKqvYRIc-zHIYtBQ9k05vHSngSe',
   },
 ];
 
@@ -60,6 +67,12 @@ const getPopupContent = (status: string): IPopupContent => {
 
 export const App = observer(() => {
   let statusContent = getPopupContent(store.dnssecStatusInfo.status);
+
+  // inject different description for different edns_error
+  if (store.dnssecStatusInfo.edns_error == 7) {
+    statusContent.description =
+      "The signatures for securing the host's addresses have expired. This is typically caused by a misconfiguration and does not necessarily indicate an active attack.";
+  }
 
   return (
     <ThemeProvider
@@ -97,6 +110,10 @@ export const App = observer(() => {
             <StatusHost>Host:</StatusHost> {store.dnssecStatusInfo.host}
           </div>
           <div>
+            <StatusHost>edns_error:</StatusHost>{' '}
+            {store.dnssecStatusInfo.edns_error}
+          </div>
+          <div>
             <StatusHost>Status:</StatusHost>{' '}
             <StatusText status={store.dnssecStatusInfo.status}>
               {store.dnssecStatusInfo.status}
@@ -104,6 +121,14 @@ export const App = observer(() => {
           </div>
           <hr />
           <div>{statusContent.description}</div>
+          <video
+            width="100%"
+            height="auto"
+            controls
+            autoPlay
+            muted
+            src={statusContent.source}
+          />
         </div>
       </StyledApp>
     </ThemeProvider>

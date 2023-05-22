@@ -6,6 +6,7 @@ import { domains } from '~/constants/domains';
 
 export const getDnssecStatus = (url: string): any => {
   let status = 'insecure';
+  let error_code = 0;
 
   let { hostname } = parse(url);
 
@@ -16,6 +17,7 @@ export const getDnssecStatus = (url: string): any => {
     } else if (url.includes('downloading')) {
       hostname = domains.downloading.domain;
       status = domains['downloading'].status;
+      error_code = 6;
     } else if (url.includes('email')) {
       hostname = domains.email.domain;
       status = domains['email'].status;
@@ -25,12 +27,14 @@ export const getDnssecStatus = (url: string): any => {
     } else if (url.includes('pay-bill')) {
       hostname = domains['pay-bill'].domain;
       status = domains['pay-bill'].status;
+      error_code = 7;
     } else if (url.includes('read-wiki')) {
       hostname = domains['read-wiki'].domain;
       status = domains['read-wiki'].status;
     } else if (url.includes('recipe')) {
       hostname = domains.recipe.domain;
       status = domains.recipe.status;
+      error_code = 7;
     } else if (url.includes('trading')) {
       hostname = domains.trading.domain;
       status = domains.trading.status;
@@ -47,6 +51,6 @@ export const getDnssecStatus = (url: string): any => {
     ignored: false,
     host: hostname,
     url: url,
-    edns_error: 1,
+    edns_error: error_code,
   } as IDnssecStatus;
 };
