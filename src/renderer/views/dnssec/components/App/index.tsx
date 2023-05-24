@@ -110,10 +110,6 @@ export const App = observer(() => {
             <StatusHost>Host:</StatusHost> {store.dnssecStatusInfo.host}
           </div>
           <div>
-            <StatusHost>edns_error:</StatusHost>{' '}
-            {store.dnssecStatusInfo.edns_error}
-          </div>
-          <div>
             <StatusHost>Status:</StatusHost>{' '}
             <StatusText status={store.dnssecStatusInfo.status}>
               {store.dnssecStatusInfo.status}
